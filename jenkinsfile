@@ -1,0 +1,44 @@
+
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git changelog: false,
+                    poll: false,
+                    url: 'https://github.com/alavalapatikishore/ecommercenov.git'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t mini-ecommerce:latest .'
+            }
+        }
+
+        stage('Docker Run') {
+            steps {
+                sh '''
+                    docker rm -f mini-shop || true
+
+                    docker run -d \
+                        --name mini-shop \
+                        -p 8081:8080 \
+                        mini-ecommerce:latest
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'E-commerce application deployed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed. Check Jenkins console output.'
+        }
+    }
+}
