@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Shop | Demo Store</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">mini<span>shop</span></a>
+    <div class="cart-pill">🛒 Cart <strong id="cart-count">0</strong></div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">EVERYDAY ESSENTIALS</p>
+        <h1>Good finds.<br><span>Better prices.</span></h1>
+        <p class="hero-copy">A tiny demo store powered by Java and Spring Boot.</p>
+        <a class="shop-link" href="#products">Explore products ↓</a>
+      </div>
+      <div class="hero-art">🛍️</div>
+    </section>
+
+    <section id="products" class="section">
+      <div class="section-heading">
+        <div><p class="eyebrow">THE COLLECTION</p><h2>Popular products</h2></div>
+        <span class="muted">4 hand-picked essentials</span>
+      </div>
+      <div id="product-grid" class="product-grid">
+        <p>Loading products from the Java backend...</p>
+      </div>
+    </section>
+
+    <section class="cart-section">
+      <div class="section-heading">
+        <div><p class="eyebrow">YOUR PICKS</p><h2>Your shopping cart</h2></div>
+      </div>
+      <div class="cart-panel">
+        <div id="cart-items"><p class="muted">Your cart is empty. Add something you like!</p></div>
+        <div class="cart-footer">
+          <div><span class="muted">Subtotal</span><strong id="cart-total">₹0.00</strong></div>
+          <button id="checkout-button" class="checkout-button" onclick="checkout()" disabled>Place order</button>
+        </div>
+      </div>
+      <p id="notice" class="notice" role="status"></p>
+    </section>
+  </main>
+
+  <footer>Mini Shop demo · Java · Spring Boot · Maven · Docker</footer>
+  <script src="/app.js"></script>
+</body>
+</html>
