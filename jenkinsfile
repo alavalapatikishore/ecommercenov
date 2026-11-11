@@ -2,6 +2,15 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'saikishorea/mini-ecommerce'
+    }
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
     stages {
 
         stage('Checkout') {
@@ -12,33 +21,73 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Validate Source') {
             steps {
-                sh 'docker build -t mini-ecommerce:latest .'
+                sh '''
+                    test -f pom.xml
+                    test -f Dockerfile
+                    test -d src
+
+                    echo "Source validation successful"
+                '''
             }
         }
 
-        stage('Docker Run') {
+        stage('Docker Build') {
             steps {
                 sh '''
-                    docker rm -f mini-shop || true
-
-                    docker run -d \
-                        --name mini-shop \
-                        -p 8081:8080 \
-                        mini-ecommerce:latest
+                    docker build --pull \
+                        -t ${DOCKER_IMAGE}:${BUILD_NUMBER} \
+                        -t ${DOCKER_IMAGE}:latest .
                 '''
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_TOKEN'
+                    )
+                ]) {
+                    sh '''
+                        set -eu
+
+                        export DOCKER_CONFIG=$(mktemp -d)
+
+                        cleanup() {
+                            docker logout || true
+                            rm -rf "$DOCKER_CONFIG"
+                        }
+
+                        trap cleanup EXIT
+
+                        echo "$DOCKER_TOKEN" | docker login \
+                            -u "$DOCKER_USER" --password-stdin
+
+                        docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+
+                        docker push ${DOCKER_IMAGE}:latest
+                    '''
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'E-commerce application deployed successfully!'
+            echo 'E-commerce image successfully pushed to Docker Hub!'
+            echo 'Image version: saikishorea/mini-ecommerce:${BUILD_NUMBER}'
         }
 
         failure {
             echo 'Pipeline failed. Check Jenkins console output.'
+        }
+
+        always {
+            echo 'Pipeline execution completed.'
         }
     }
 }
