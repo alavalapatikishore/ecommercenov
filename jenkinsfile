@@ -1,6 +1,6 @@
 
 pipeline {
-    agent any
+    agent {label 'jenkinsworker'}
 
     environment {
         DOCKER_IMAGE = 'saikishorea/mini-ecommerce'
